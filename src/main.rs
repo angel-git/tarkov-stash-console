@@ -43,9 +43,23 @@ fn profile_prompt() {
 
     let file_path = Path::new(file_str);
     if file_path.exists() {
+        create_backup_if_needed(file_str);
         profile_edit_prompt(file_str);
     } else {
         println!("Something went wrong reading your profile file, is the path correct?")
+    }
+}
+
+fn create_backup_if_needed(profile_path: &str) {
+    let backup_pack = String::from(profile_path)+".back";
+    let backup_pack_str = backup_pack.as_str();
+    let file_path = Path::new(backup_pack_str);
+    if !file_path.exists() {
+        println!("--------------------------------");
+        println!("Looks like you don't have a backup of your profile, I will create one under: {backup_pack_str}");
+        std::fs::copy(profile_path, backup_pack_str).unwrap();
+        println!("Backup created, you can restore that if your profile gets broken.");
+        println!("--------------------------------");
     }
 }
 
