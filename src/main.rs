@@ -93,16 +93,18 @@ fn increase_currency(profile_path: &str, tpl_id: &str) -> Result<(), Error> {
         .and_then(|v| v.as_array_mut());
 
     if let Some(items) = optional_items {
-        if let Some(item) = items
+        let upd_items = items
             .into_iter()
-            .find(|i| i.get("_tpl").unwrap().as_str().unwrap() == tpl_id)
-        {
-            if let Some(upd) = item.get_mut("upd") {
+            .filter(|i| i.get("_tpl").unwrap().as_str().unwrap() == tpl_id)
+            .map(|i| i.get_mut("upd"));
+
+        upd_items.for_each(|i| {
+            if let Some(upd) = i {
                 if let Some(value) = upd.get_mut("StackObjectsCount") {
                     *value = Value::from(500000);
                 }
             }
-        }
+        });
     }
 
     let updated_content = serde_json::to_string(&root).unwrap();
