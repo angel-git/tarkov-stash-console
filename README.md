@@ -8,6 +8,10 @@ Never run any `.exe` file that you have downloaded from internet. Including this
 
 ![Screenshot](currency.gif)
 
+### Download
+
+See the [releases](https://github.com/angel-git/tarkov-stash-console/releases) page.
+
 ### Features
 
 #### Currency (v0.1.0)
