@@ -52,7 +52,7 @@ fn profile_prompt() {
 }
 
 fn create_backup_if_needed(profile_path: &str) {
-    let backup_pack = String::from(profile_path)+".back";
+    let backup_pack = String::from(profile_path) + ".back";
     let backup_pack_str = backup_pack.as_str();
     let file_path = Path::new(backup_pack_str);
     if !file_path.exists() {
@@ -88,10 +88,10 @@ fn profile_edit_prompt(profile_path: &str) {
 
     match increase_result {
         Ok(_) => {
-            println!("✅ Profile updated")
+            println!("✅ Profile updated");
         }
         Err(e) => {
-            println!("❌ Something went wrong when writing your profile: {e}")
+            println!("❌ Something went wrong when writing your profile: {e}");
         }
     }
 }
@@ -109,7 +109,7 @@ fn increase_currency(profile_path: &str, tpl_id: &str) -> Result<(), Error> {
 
     if let Some(items) = optional_items {
         let upd_items = items
-            .into_iter()
+            .iter_mut()
             .filter(|i| i.get("_tpl").unwrap().as_str().unwrap() == tpl_id)
             .map(|i| i.get_mut("upd"));
 
