@@ -3,10 +3,11 @@ use std::net::TcpStream;
 use std::path::Path;
 
 use inquire::{Select, Text};
-use serde_json::Value;
 use spinners::{Spinner, Spinners};
+use stash::stash_utils::increase_currency;
 
 pub mod spt;
+pub mod stash;
 
 fn main() {
     const NAME: &str = env!("CARGO_PKG_NAME");
@@ -94,34 +95,4 @@ fn profile_edit_prompt(profile_path: &str) {
             println!("❌ Something went wrong when writing your profile: {e}");
         }
     }
-}
-
-fn increase_currency(profile_path: &str, tpl_id: &str) -> Result<(), Error> {
-    let content = std::fs::read_to_string(profile_path).unwrap();
-    let mut root: Value = serde_json::from_str(content.as_str()).unwrap();
-
-    let optional_items = root
-        .get_mut("characters")
-        .and_then(|v| v.get_mut("pmc"))
-        .and_then(|v| v.get_mut("Inventory"))
-        .and_then(|v| v.get_mut("items"))
-        .and_then(|v| v.as_array_mut());
-
-    if let Some(items) = optional_items {
-        let upd_items = items
-            .iter_mut()
-            .filter(|i| i.get("_tpl").unwrap().as_str().unwrap() == tpl_id)
-            .map(|i| i.get_mut("upd"));
-
-        upd_items.for_each(|i| {
-            if let Some(upd) = i {
-                if let Some(value) = upd.get_mut("StackObjectsCount") {
-                    *value = Value::from(500000);
-                }
-            }
-        });
-    }
-
-    let updated_content = serde_json::to_string(&root).unwrap();
-    std::fs::write(profile_path, updated_content)
 }
