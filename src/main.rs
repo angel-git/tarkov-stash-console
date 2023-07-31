@@ -12,6 +12,7 @@ fn main() {
     const NAME: &str = env!("CARGO_PKG_NAME");
     const VERSION: &str = env!("CARGO_PKG_VERSION");
     println!(">>> Welcome to {NAME} v{VERSION} <<<");
+    println!(">>> This version has only been tested with SPT 3.5.7 <<<");
 
     let mut sp = Spinner::new(Spinners::Dots9, "Checking SPT server...".into());
     match TcpStream::connect("127.0.0.1:6969") {
