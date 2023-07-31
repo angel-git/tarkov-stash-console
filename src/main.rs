@@ -37,7 +37,7 @@ fn start() {
 
 fn profile_prompt() {
     let file = Text::new("What is your profile path?")
-        .with_help_message("Example: C:\\SPT\\user\\profile\\4324234.json")
+        .with_help_message("Example: C:\\SPT\\user\\profiles\\4324234.json")
         .prompt()
         .unwrap();
 
