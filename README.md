@@ -2,6 +2,10 @@
 
 Simple profile editor to increase and change various items from your stash.
 
+It is recommended to run this with [Windows terminal](https://apps.microsoft.com/store/detail/windows-terminal/9N0DX20HK701) and not the default command prompt, the only difference is that Terminal supports emojis :-)
+
+Never run any `.exe` file that you have downloaded from internet. Including this. Use it at your own risk.
+
 ![Screenshot](currency.gif)
 
 ### Features
