@@ -4,8 +4,12 @@ use std::path::Path;
 
 use inquire::{Select, Text};
 use spinners::{Spinner, Spinners};
+
 use stash::stash_utils::increase_currency;
 
+use crate::prompt::item_options::{ItemOption, ItemOptions};
+
+pub mod prompt;
 pub mod spt;
 pub mod stash;
 
@@ -28,11 +32,20 @@ fn main() {
         }
     }
 
-    start();
+    profile_prompt();
 }
 
-fn start() {
-    profile_prompt();
+fn start(profile_path: &str) {
+    let options = vec!["Increase currency", "Add FIR status"];
+    let ans = Select::new("What would you like to modify?", options)
+        .prompt()
+        .unwrap();
+
+    if ans == "Increase currency" {
+        profile_edit_currency_prompt(profile_path);
+    } else {
+        profile_edit_fir_prompt(profile_path);
+    }
 }
 
 fn profile_prompt() {
@@ -46,7 +59,7 @@ fn profile_prompt() {
     let file_path = Path::new(file_str);
     if file_path.exists() {
         create_backup_if_needed(file_str);
-        profile_edit_prompt(file_str);
+        start(file_str);
     } else {
         println!("Something went wrong reading your profile file, is the path correct?")
     }
@@ -65,7 +78,7 @@ fn create_backup_if_needed(profile_path: &str) {
     }
 }
 
-fn profile_edit_prompt(profile_path: &str) {
+fn profile_edit_currency_prompt(profile_path: &str) {
     println!("This will increase your current stock to 500.000 on every slot that ALREADY contains currency.");
 
     let options = vec!["roubles", "USD", "euros"];
@@ -88,6 +101,23 @@ fn profile_edit_prompt(profile_path: &str) {
     };
 
     match increase_result {
+        Ok(_) => {
+            println!("✅ Profile updated");
+        }
+        Err(e) => {
+            println!("❌ Something went wrong when writing your profile: {e}");
+        }
+    }
+}
+
+fn profile_edit_fir_prompt(profile_path: &str) {
+    println!("This will set FIR status to any item on your stash.");
+    let items_completer = ItemOptions::new(profile_path.to_owned());
+    let ans = Select::<ItemOption>::new("Type item name", items_completer.get_items())
+        .prompt()
+        .unwrap();
+
+    match items_completer.update_fir_item(ans) {
         Ok(_) => {
             println!("✅ Profile updated");
         }
