@@ -1,8 +1,9 @@
 use std::io::{Error, ErrorKind};
 use std::net::TcpStream;
 use std::path::Path;
+use std::process::exit;
 
-use inquire::{Select, Text};
+use inquire::{Confirm, Select, Text};
 use spinners::{Spinner, Spinners};
 
 use stash::stash_utils::increase_currency;
@@ -17,15 +18,26 @@ fn main() {
     const NAME: &str = env!("CARGO_PKG_NAME");
     const VERSION: &str = env!("CARGO_PKG_VERSION");
     println!(">>> Welcome to {NAME} v{VERSION} <<<");
-    println!(">>> This version has only been tested with SPT 3.5.7 <<<");
+    println!(">>> This version has only been tested with SPT 3.5.7 and 3.6.0 <<<");
+    check_server();
+}
 
+fn check_server() {
     let mut sp = Spinner::new(Spinners::Dots9, "Checking SPT server...".into());
     match TcpStream::connect("127.0.0.1:6969") {
         Ok(_) => {
             sp.stop_with_message(
                 "❌ Looks like your SPT server is running, please stop it and try again".into(),
             );
-            return;
+            let ans = Confirm::new("Try again?")
+                .with_placeholder("y/n")
+                .prompt()
+                .unwrap();
+            if ans {
+                check_server();
+            } else {
+                exit(0x0100);
+            }
         }
         _ => {
             sp.stop_with_message("✅ SPT server is not running".into());
@@ -33,19 +45,6 @@ fn main() {
     }
 
     profile_prompt();
-}
-
-fn start(profile_path: &str) {
-    let options = vec!["Increase currency", "Add FIR status"];
-    let ans = Select::new("What would you like to modify?", options)
-        .prompt()
-        .unwrap();
-
-    if ans == "Increase currency" {
-        profile_edit_currency_prompt(profile_path);
-    } else {
-        profile_edit_fir_prompt(profile_path);
-    }
 }
 
 fn profile_prompt() {
@@ -63,6 +62,23 @@ fn profile_prompt() {
     } else {
         println!("Something went wrong reading your profile file, is the path correct?")
     }
+}
+
+fn start(profile_path: &str) {
+    let options = vec!["Increase currency", "Add FIR status", "Nothing, exit"];
+    let ans = Select::new("What would you like to modify?", options)
+        .prompt()
+        .unwrap();
+
+    if ans == "Increase currency" {
+        profile_edit_currency_prompt(profile_path);
+    } else if ans == "Add FIR status" {
+        profile_edit_fir_prompt(profile_path);
+    } else {
+        exit(0x0100);
+    }
+
+    start(profile_path);
 }
 
 fn create_backup_if_needed(profile_path: &str) {
