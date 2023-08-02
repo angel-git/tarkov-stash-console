@@ -28,4 +28,5 @@ Increase your current currency (euros, roubles, dollars) to 500.000 (each stack)
 
 | stash version | SPT version  |
 |---------------|--------------|
-| v0.1.0        | 3.5.7        |
+| v0.1.x        | 3.5.7        |
+| v0.2.x        | 3.5.7, 3.6.0 |
