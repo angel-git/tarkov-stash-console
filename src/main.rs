@@ -57,7 +57,7 @@ fn profile_prompt() {
 
     let file_path = Path::new(file_str);
     if file_path.exists() {
-        create_backup_if_needed(file_str);
+        create_backup(file_str);
         start(file_str);
     } else {
         println!("Something went wrong reading your profile file, is the path correct?")
@@ -81,17 +81,17 @@ fn start(profile_path: &str) {
     start(profile_path);
 }
 
-fn create_backup_if_needed(profile_path: &str) {
-    let backup_pack = String::from(profile_path) + ".back";
-    let backup_pack_str = backup_pack.as_str();
-    let file_path = Path::new(backup_pack_str);
-    if !file_path.exists() {
-        println!("--------------------------------");
-        println!("Looks like you don't have a backup of your profile, I will create one under: {backup_pack_str}");
-        std::fs::copy(profile_path, backup_pack_str).unwrap();
-        println!("Backup created, you can restore that if your profile gets broken.");
-        println!("--------------------------------");
+fn create_backup(profile_path: &str) {
+    let mut backup_number = 0;
+    let mut backup_path = format!("{profile_path}.back.{backup_number}");
+    while std::fs::metadata(&backup_path).is_ok() {
+        backup_number += 1;
+        backup_path = format!("{profile_path}.back.{backup_number}");
     }
+    println!(
+        "ℹ️  Creating backup under {backup_path}, you can restore that if your profile gets broken."
+    );
+    std::fs::copy(profile_path, backup_path).unwrap();
 }
 
 fn profile_edit_currency_prompt(profile_path: &str) {
